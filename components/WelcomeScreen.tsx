@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Upload, BarChart2, DollarSign } from 'lucide-react';
+import { ArrowRight, Camera, Sparkles, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface WelcomeScreenProps {
@@ -30,8 +30,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
                 <h1 className="text-5xl font-bold mb-3 text-text tracking-tight">
                     Cuentas <span className="text-primary">Claras</span>
                 </h1>
-                <p className="text-lg text-text-muted mb-10 font-light">
-                    Tu dinero, tus reglas.
+                <p className="text-lg text-text-muted mb-2 font-light">
+                    Para servers que quieren saber exactamente cuánto cobran.
+                </p>
+                <p className="text-sm text-text-muted/70 mb-10">
+                    Subí tu foto o PDF del pay stub de Toast y la IA hace el resto.
                 </p>
 
                 <motion.button
@@ -40,19 +43,20 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
                     onClick={onStart}
                     className="w-full bg-primary text-white font-semibold py-4 px-8 rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:bg-primary-hover transition-all flex items-center justify-center group text-lg"
                 >
-                    Comenzar Ahora
+                    Comenzar
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </motion.button>
 
-                <div className="grid grid-cols-3 gap-6 mt-14 border-t border-surface-border pt-10">
+                <div className="grid grid-cols-3 gap-4 mt-12 border-t border-surface-border pt-10">
                     {[
-                        { icon: <Upload size={20} />, label: 'Sube', color: 'text-primary', bg: 'bg-primary/10' },
-                        { icon: <BarChart2 size={20} />, label: 'Analiza', color: 'text-secondary', bg: 'bg-secondary/10' },
-                        { icon: <DollarSign size={20} />, label: 'Cobra', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-                    ].map(({ icon, label, color, bg }) => (
+                        { icon: <Camera size={20} />, label: 'Foto o PDF', sub: 'del pay stub de Toast', color: 'text-primary', bg: 'bg-primary/10' },
+                        { icon: <Sparkles size={20} />, label: 'La IA lee', sub: 'horas, tips y gratuity', color: 'text-secondary', bg: 'bg-secondary/10' },
+                        { icon: <DollarSign size={20} />, label: 'Ves tu cheque', sub: 'con todo explicado', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                    ].map(({ icon, label, sub, color, bg }) => (
                         <div key={label} className="flex flex-col items-center gap-2">
                             <div className={`p-3 ${bg} ${color} rounded-full`}>{icon}</div>
-                            <span className="text-xs font-medium text-text-muted">{label}</span>
+                            <span className="text-xs font-semibold text-text">{label}</span>
+                            <span className="text-xs text-text-muted leading-tight">{sub}</span>
                         </div>
                     ))}
                 </div>

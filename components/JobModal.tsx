@@ -64,10 +64,14 @@ export const JobModal: React.FC<JobModalProps> = ({ isOpen, onClose, onSave, job
                     error={errors.name}
                 />
 
+                <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs text-text-muted">
+                    Encontrás estos datos en tu pay stub de Toast, arriba a la derecha donde dice <span className="font-semibold text-text">Pay Rate</span>.
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <Input
-                            label="Tarifa por hora ($)"
+                            label="Tarifa principal ($/hr)"
                             name="primaryRate"
                             type="number"
                             step="0.01"
@@ -77,11 +81,11 @@ export const JobModal: React.FC<JobModalProps> = ({ isOpen, onClose, onSave, job
                             placeholder="ej: 17.00"
                             error={errors.primaryRate}
                         />
-                        <p className="text-xs text-text-muted mt-1 pl-1">Tu tarifa principal</p>
+                        <p className="text-xs text-text-muted mt-1 pl-1">La que dice "Pay Rate" en tu pay stub</p>
                     </div>
                     <div>
                         <Input
-                            label="Segunda tarifa ($) — opcional"
+                            label="Segunda tarifa ($/hr) — opcional"
                             name="secondaryRate"
                             type="number"
                             step="0.01"
@@ -90,7 +94,7 @@ export const JobModal: React.FC<JobModalProps> = ({ isOpen, onClose, onSave, job
                             onChange={handleChange}
                             placeholder="ej: 14.00"
                         />
-                        <p className="text-xs text-text-muted mt-1 pl-1">Si trabajás en otro rol</p>
+                        <p className="text-xs text-text-muted mt-1 pl-1">Si también trabajás a otra tarifa</p>
                     </div>
                 </div>
 
@@ -109,14 +113,14 @@ export const JobModal: React.FC<JobModalProps> = ({ isOpen, onClose, onSave, job
                             placeholder="ej: 10"
                         />
                         <p className="text-xs text-text-muted mt-1 pl-1">
-                            Varía según tu salario anual. Podés verlo en tu último pay stub bajo "Federal Income Tax".
+                            Mirá tu último pay stub en la sección "Taxes" → "Federal Income Tax" — dividí ese monto por tu Gross y multiplicá por 100.
                         </p>
                     </div>
                     <div className="mt-3 p-3 bg-surface-hover rounded-lg">
                         <p className="text-xs text-text-muted">
                             <span className="font-semibold text-text">Medicare (1.45%)</span> y{' '}
-                            <span className="font-semibold text-text">Social Security (6.2%)</span> son fijos
-                            por ley para todos los trabajadores — se calculan automáticamente.
+                            <span className="font-semibold text-text">Social Security (6.2%)</span> son iguales
+                            para todos — se calculan automáticamente.
                         </p>
                     </div>
                 </div>

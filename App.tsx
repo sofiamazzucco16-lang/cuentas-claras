@@ -282,6 +282,7 @@ function App() {
                             <ExplanationCard summary={currentData.summary} />
                             <ShiftHistory
                                 shifts={currentData.shifts}
+                                primaryRate={selectedJob ? parseFloat(selectedJob.primaryRate) : undefined}
                                 onEditShift={handleEditShift}
                                 onDeleteShift={handleDeleteShift}
                             />
