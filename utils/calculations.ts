@@ -46,47 +46,35 @@ export const recalculatePayDetails = (
     job: Job
 ): { payDetails: PayDetails; summary: string } => {
     const primaryRate = parseFloat(job.primaryRate) || 0;
-    const secondaryRate = parseFloat(job.secondaryRate) || 0;
-
-    // Calcular pago por horas respetando la tarifa de cada turno
     const { regularHours, overtimeHours } = calculateHoursBreakdown(shifts);
     const totalHours = regularHours + overtimeHours;
 
-    // Si hay tarifa secundaria, calcular el pago por turno según su rate
+    // Pagar cada turno a su tarifa individual (shift.hourlyRate) o la primaria
+    // El overtime premium (50% extra) se aplica sobre la tarifa primaria
     let regularPay = 0;
-    if (secondaryRate > 0) {
-        // Pagar cada turno a su tarifa correspondiente (overtime al 150% de la primaria)
-        for (const shift of shifts) {
-            const rate = shift.hourlyRate || primaryRate;
-            regularPay += shift.totalHours * rate;
-        }
-        // Ajustar overtime: las horas extra van al 150% de la tarifa primaria
-        // Ya incluidas en el loop anterior a la tasa normal, ajustar la diferencia
-        if (overtimeHours > 0) {
-            regularPay += overtimeHours * primaryRate * 0.5;
-        }
-    } else {
-        regularPay = regularHours * primaryRate;
+    for (const shift of shifts) {
+        const rate = shift.hourlyRate || primaryRate;
+        regularPay += shift.totalHours * rate;
     }
 
-    const overtimePay = secondaryRate > 0 ? 0 : overtimeHours * primaryRate * 1.5;
-    const totalRegularPay = secondaryRate > 0 ? regularPay : regularPay;
-    const totalOvertimePay = secondaryRate > 0 ? 0 : overtimePay;
+    // Overtime premium: el 50% adicional sobre la tarifa primaria para las horas extra
+    // (el 100% base ya fue pagado en el loop anterior)
+    const overtimePay = overtimeHours > 0 ? overtimeHours * primaryRate * 0.5 : 0;
 
     const gratuity = shifts.reduce((sum, s) => sum + (Number(s.gratuity) || 0), 0);
     const tips = shifts.reduce((sum, s) => sum + (Number(s.tips) || 0), 0);
 
-    const grossPay = totalRegularPay + totalOvertimePay + gratuity + tips;
+    const grossPay = regularPay + overtimePay + gratuity + tips;
 
     // Impuestos
     const federalTaxRate = parseFloat(job.federalTaxRate) || 0;
     const federalTax = grossPay * (federalTaxRate / 100);
-    const medicareTax = grossPay * 0.0145;
-    const socialSecurityTax = grossPay * 0.062;
+    const medicareTax = grossPay * 0.0145;       // 1.45% fijo por ley
+    const socialSecurityTax = grossPay * 0.062;  // 6.2% fijo por ley
     const totalTaxes = federalTax + medicareTax + socialSecurityTax;
     const netPay = grossPay - totalTaxes;
 
-    // Resumen en español claro
+    // Resumen en español
     const summaryLines: string[] = [
         `${shifts.length} turno${shifts.length !== 1 ? 's' : ''} — ${totalHours.toFixed(2)} horas en total.`,
     ];
@@ -100,8 +88,8 @@ export const recalculatePayDetails = (
     const payDetails: PayDetails = {
         regularHours,
         overtimeHours,
-        regularPay: totalRegularPay,
-        overtimePay: totalOvertimePay,
+        regularPay,
+        overtimePay,
         gratuity,
         tips,
         grossPay,

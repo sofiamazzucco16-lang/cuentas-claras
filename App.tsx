@@ -267,6 +267,11 @@ function App() {
                                     totalJobsAnalyzed={globalSummary.totalJobsAnalyzed}
                                 />
                             )}
+                            {!jobs.find(j => j.id === currentData.jobId) && (
+                                <div className="text-sm text-text-muted bg-surface-hover border border-surface-border rounded-xl px-4 py-3">
+                                    El trabajo de este análisis fue eliminado. Los datos se conservan pero no se puede recalcular.
+                                </div>
+                            )}
                             <SummaryCard
                                 payDetails={currentData.payDetails}
                                 job={jobs.find(j => j.id === currentData.jobId)}

@@ -27,23 +27,37 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onCon
         }
     }, [initialShifts, isOpen]);
 
+    const [timeError, setTimeError] = useState<string | null>(null);
+
     const handleShiftChange = (index: number, field: keyof EditableShift, value: string) => {
         const newShifts = [...editableShifts];
         const shiftToUpdate = { ...newShifts[index] };
-        (shiftToUpdate as any)[field] = value;
+
+        switch (field) {
+            case 'date': shiftToUpdate.date = value; break;
+            case 'startTime': shiftToUpdate.startTime = value; break;
+            case 'endTime': shiftToUpdate.endTime = value; break;
+            case 'breakHours': shiftToUpdate.breakHours = value; break;
+            case 'totalHours': shiftToUpdate.totalHours = value; break;
+            case 'tips': shiftToUpdate.tips = value; break;
+            case 'gratuity': shiftToUpdate.gratuity = value; break;
+            case 'notes': shiftToUpdate.notes = value; break;
+            default: break;
+        }
 
         if (['startTime', 'endTime', 'breakHours'].includes(field)) {
             const { startTime, endTime, breakHours } = shiftToUpdate;
             if (startTime && endTime && typeof startTime === 'string' && typeof endTime === 'string') {
-                try {
-                    const start = new Date(`1970-01-01T${startTime}:00Z`);
-                    const end = new Date(`1970-01-01T${endTime}:00Z`);
+                const start = new Date(`1970-01-01T${startTime}:00Z`);
+                const end = new Date(`1970-01-01T${endTime}:00Z`);
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                    setTimeError('Formato de hora inválido');
+                } else {
+                    setTimeError(null);
                     let diffHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
                     if (diffHours < 0) diffHours += 24;
-                    const breakValue = parseFloat(String(breakHours).trim()) || 0;
+                    const breakValue = parseFloat(String(breakHours)) || 0;
                     shiftToUpdate.totalHours = Math.max(0, diffHours - breakValue).toFixed(2);
-                } catch (e) {
-                    console.error("Invalid time format", e);
                 }
             }
         }
@@ -75,9 +89,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onCon
             title="Revisar Turnos Extraídos"
             className="max-w-3xl"
         >
-            <p className="text-text-muted mb-6 text-sm">
+            <p className="text-text-muted mb-4 text-sm">
                 Verifica la información extraída y corrige lo que sea necesario antes de confirmar.
             </p>
+            {timeError && (
+                <p className="text-error text-sm mb-4 bg-error/10 px-3 py-2 rounded-lg border border-error/20">
+                    {timeError}
+                </p>
+            )}
 
             <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
                 {editableShifts.map((shift, index) => (

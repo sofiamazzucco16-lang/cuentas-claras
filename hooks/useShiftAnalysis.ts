@@ -76,13 +76,22 @@ Instrucciones:
             let parsedData: any;
             try {
                 parsedData = JSON.parse(jsonText);
-            } catch (jsonError) {
-                console.error("Failed to parse JSON response:", jsonText, jsonError);
-                throw new Error("La respuesta de la IA no era un JSON válido. Asegúrate de que la imagen de la hoja de tiempo sea clara y legible.");
+            } catch {
+                // Intentar extraer JSON del texto si viene con texto adicional
+                const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    try {
+                        parsedData = JSON.parse(jsonMatch[0]);
+                    } catch {
+                        throw new Error("No se pudo leer la respuesta de la IA. Probá con una foto más clara o nítida.");
+                    }
+                } else {
+                    throw new Error("No se pudo leer la respuesta de la IA. Probá con una foto más clara o nítida.");
+                }
             }
 
             const sanitizedShifts = (parsedData.shifts || []).map((shift: any): Shift => ({
-                id: String(shift.id || `shift-${Date.now()}-${Math.random()}`),
+                id: String(shift.id || crypto.randomUUID()),
                 date: String(shift.date || ''),
                 startTime: String(shift.startTime || ''),
                 endTime: String(shift.endTime || ''),
@@ -101,9 +110,10 @@ Instrucciones:
             });
             setReviewModalOpen(true);
 
-        } catch (e: any) {
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : 'Error desconocido';
             console.error(e);
-            setError(`Ocurrió un error: ${e.message}`);
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -144,7 +154,7 @@ Instrucciones:
 
         const newShift: Shift = {
             ...shift,
-            id: `manual-${Date.now()}-${Math.random()}`
+            id: `manual-${crypto.randomUUID()}`
         };
 
         const currentData = parsedDataByJob[selectedJobId];

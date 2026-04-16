@@ -23,8 +23,8 @@ const defaultJob: Job = {
 };
 
 // Migración: convierte jobs viejos (con hourlyRate, etc.) al nuevo formato
-const migrateJob = (job: any): Job => {
-    if (job.primaryRate !== undefined) return job as Job;
+const migrateJob = (job: Record<string, unknown>): Job => {
+    if (job.primaryRate !== undefined) return job as unknown as Job;
     return {
         id: job.id,
         name: job.name,
@@ -35,7 +35,7 @@ const migrateJob = (job: any): Job => {
 };
 
 export const JobProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [rawJobs, setJobs] = useLocalStorage<any[]>('cc_jobs', [defaultJob]);
+    const [rawJobs, setJobs] = useLocalStorage<Record<string, unknown>[]>('cc_jobs', [defaultJob as unknown as Record<string, unknown>]);
     const [selectedJobId, setSelectedJobId] = useLocalStorage<string | null>('cc_selected_job_id', 'default-1');
 
     const jobs: Job[] = useMemo(() => rawJobs.map(migrateJob), [rawJobs]);

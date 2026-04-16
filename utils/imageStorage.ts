@@ -15,16 +15,21 @@ export const fileToBase64 = (file: File): Promise<string> => {
     });
 };
 
-export const base64ToFile = (base64: string, filename: string): File => {
-    const arr = base64.split(',');
-    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
+export const base64ToFile = (base64: string, filename: string): File | null => {
+    try {
+        const arr = base64.split(',');
+        if (arr.length < 2 || !arr[1]) return null;
+        const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, { type: mime });
+    } catch {
+        return null;
     }
-    return new File([u8arr], filename, { type: mime });
 };
 
 export interface StoredImage {
@@ -43,5 +48,7 @@ export const filesToStoredImages = async (files: File[]): Promise<StoredImage[]>
 };
 
 export const storedImagesToFiles = (storedImages: StoredImage[]): File[] => {
-    return storedImages.map(img => base64ToFile(img.base64, img.filename));
+    return storedImages
+        .map(img => base64ToFile(img.base64, img.filename))
+        .filter((f): f is File => f !== null);
 };

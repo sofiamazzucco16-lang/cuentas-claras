@@ -55,9 +55,6 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({ payDetails, job }) => 
     const primaryRate = parseFloat(job?.primaryRate || '0');
     const overtimeRate = primaryRate * 1.5;
     const federalPct = parseFloat(job?.federalTaxRate || '0');
-    const effectiveTaxPct = payDetails.grossPay > 0
-        ? ((payDetails.totalTaxes / payDetails.grossPay) * 100).toFixed(1)
-        : '0';
 
     return (
         <Card title={`Resumen de pago — ${job?.name || ''}`}>

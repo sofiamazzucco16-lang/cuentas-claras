@@ -1,4 +1,4 @@
-const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY as string;
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined;
 const OPENROUTER_MODEL = 'google/gemini-2.0-flash-exp:free';
 
 export const fileToBase64 = (file: File): Promise<{ base64: string; mimeType: string }> => {
@@ -15,9 +15,13 @@ export const fileToBase64 = (file: File): Promise<{ base64: string; mimeType: st
 };
 
 export const analyzeFilesWithAI = async (files: File[], prompt: string): Promise<string> => {
+    if (!OPENROUTER_API_KEY) {
+        throw new Error('No se encontró la clave de API. Verificá la configuración de la app.');
+    }
+
     const fileParts = await Promise.all(files.map(fileToBase64));
 
-    const contentParts: any[] = [
+    const contentParts: Array<{ type: string; text?: string; image_url?: { url: string } }> = [
         { type: 'text', text: prompt },
         ...fileParts.map(({ base64, mimeType }) => ({
             type: 'image_url',
@@ -37,22 +41,18 @@ export const analyzeFilesWithAI = async (files: File[], prompt: string): Promise
         },
         body: JSON.stringify({
             model: OPENROUTER_MODEL,
-            messages: [
-                {
-                    role: 'user',
-                    content: contentParts,
-                }
-            ],
+            messages: [{ role: 'user', content: contentParts }],
             response_format: { type: 'json_object' },
         }),
     });
 
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`OpenRouter error ${response.status}: ${errorData?.error?.message || response.statusText}`);
+        const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } };
+        const msg = errorData?.error?.message || response.statusText;
+        throw new Error(`Error al contactar la IA (${response.status}): ${msg}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
     const text = data.choices?.[0]?.message?.content;
 
     if (!text) {

@@ -56,6 +56,10 @@ export const EditShiftModal: React.FC<EditShiftModalProps> = ({ isOpen, onClose,
             newErrors.endTime = 'La hora de fin debe ser después de la hora de inicio';
         }
 
+        if (!isNaN(breakHours) && breakHours >= totalHours && totalHours > 0) {
+            newErrors.breakHours = 'El descanso no puede ser mayor o igual al total de horas del turno';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -81,20 +85,6 @@ export const EditShiftModal: React.FC<EditShiftModalProps> = ({ isOpen, onClose,
         onClose();
     };
 
-    React.useEffect(() => {
-        if (isOpen) {
-            setFormData({
-                date: shift.date,
-                startTime: shift.startTime,
-                endTime: shift.endTime,
-                breakHours: shift.breakHours.toString(),
-                tips: shift.tips.toString(),
-                gratuity: shift.gratuity.toString(),
-                notes: shift.notes || ''
-            });
-            setErrors({});
-        }
-    }, [isOpen, shift]);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Editar Turno">

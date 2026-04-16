@@ -56,6 +56,10 @@ export const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, o
             newErrors.endTime = 'La hora de fin debe ser después de la hora de inicio';
         }
 
+        if (!isNaN(breakHours) && breakHours >= totalHours && totalHours > 0) {
+            newErrors.breakHours = 'El descanso no puede ser mayor o igual al total de horas del turno';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -146,13 +150,13 @@ export const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, o
                 </div>
 
                 <Input
-                    label="Tarifa por hora ($) — opcional"
+                    label="¿Tarifa diferente este turno? ($) — opcional"
                     type="number"
                     step="0.01"
                     min="0"
                     value={formData.hourlyRate}
                     onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
-                    placeholder="ej: 14.00 (dejar vacío para usar la tarifa del trabajo)"
+                    placeholder="Solo si este turno fue a una tarifa distinta (ej: $14)"
                 />
 
                 <div className="grid grid-cols-2 gap-4">
