@@ -88,9 +88,8 @@ function App() {
         if (analyzedJobsData.length < 2) return null;
 
         const initialPayDetails: PayDetails = {
-            grossPay: 0, regularHours: 0, overtimeHours: 0,
-            regularPay: 0, overtimePay: 0, tips: 0, gratuity: 0,
-            federalTax: 0, medicareTax: 0, socialSecurityTax: 0,
+            totalHours: 0, regularPay: 0, tips: 0, gratuity: 0,
+            grossPay: 0, federalTax: 0, medicareTax: 0, socialSecurityTax: 0,
             totalTaxes: 0, netPay: 0
         };
 

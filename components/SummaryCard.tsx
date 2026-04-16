@@ -49,11 +49,11 @@ const LineRow: React.FC<LineRowProps> = ({ label, sublabel, value, tooltip, isTo
 );
 
 const fmt = (n: number) => `$${n.toFixed(2)}`;
+const effectivePct = (pd: PayDetails) =>
+    pd.grossPay > 0 ? ((pd.totalTaxes / pd.grossPay) * 100).toFixed(1) : '0';
 
 export const SummaryCard: React.FC<SummaryCardProps> = ({ payDetails, job }) => {
-    const totalHours = payDetails.regularHours + payDetails.overtimeHours;
     const primaryRate = parseFloat(job?.primaryRate || '0');
-    const overtimeRate = primaryRate * 1.5;
     const federalPct = parseFloat(job?.federalTaxRate || '0');
 
     return (
@@ -63,7 +63,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({ payDetails, job }) => 
                 <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Cheque estimado</p>
                 <p className="text-4xl font-bold text-primary">{fmt(payDetails.netPay)}</p>
                 <p className="text-sm text-text-muted mt-1">
-                    {totalHours.toFixed(2)} horas trabajadas · {effectivePct(payDetails)}% de descuento total
+                    {payDetails.totalHours.toFixed(2)} horas trabajadas · {effectivePct(payDetails)}% de descuento total
                 </p>
             </div>
 
@@ -72,20 +72,11 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({ payDetails, job }) => 
                 <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Ganancias</p>
                 <div className="divide-y divide-surface-border/30">
                     <LineRow
-                        label="Horas regulares"
-                        sublabel={`${payDetails.regularHours.toFixed(2)}h × $${primaryRate.toFixed(2)}`}
+                        label="Horas trabajadas"
+                        sublabel={`${payDetails.totalHours.toFixed(2)}h × $${primaryRate.toFixed(2)}`}
                         value={fmt(payDetails.regularPay)}
-                        tooltip="Tu pago base: horas trabajadas multiplicadas por tu tarifa por hora."
+                        tooltip="Tu pago por horas: total de horas trabajadas multiplicado por tu tarifa."
                     />
-                    {payDetails.overtimeHours > 0 && (
-                        <LineRow
-                            label="Horas extra (overtime)"
-                            sublabel={`${payDetails.overtimeHours.toFixed(2)}h × $${overtimeRate.toFixed(2)} (150%)`}
-                            value={fmt(payDetails.overtimePay)}
-                            tooltip="Horas trabajadas por encima de 40 en la semana. La ley federal exige pagar 1.5x la tarifa normal."
-                            accent
-                        />
-                    )}
                     {payDetails.gratuity > 0 && (
                         <LineRow
                             label="Gratuity (service charge)"
@@ -159,6 +150,3 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({ payDetails, job }) => 
         </Card>
     );
 };
-
-const effectivePct = (pd: PayDetails) =>
-    pd.grossPay > 0 ? ((pd.totalTaxes / pd.grossPay) * 100).toFixed(1) : '0';

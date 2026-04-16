@@ -9,7 +9,6 @@ interface GlobalSummaryCardProps {
 }
 
 export const GlobalSummaryCard: React.FC<GlobalSummaryCardProps> = ({ totalPayDetails, totalJobsAnalyzed }) => {
-    const totalHours = totalPayDetails.regularHours + totalPayDetails.overtimeHours;
     const effectiveTaxRate = totalPayDetails.grossPay > 0
         ? (totalPayDetails.totalTaxes / totalPayDetails.grossPay) * 100
         : 0;
@@ -27,13 +26,13 @@ export const GlobalSummaryCard: React.FC<GlobalSummaryCardProps> = ({ totalPayDe
                 <StatCard
                     label="Bruto total"
                     value={`$${totalPayDetails.grossPay.toFixed(2)}`}
-                    description={`Antes de descuentos`}
+                    description="Antes de descuentos"
                     icon={Icons.Cash}
                 />
                 <StatCard
                     label="Horas totales"
-                    value={totalHours.toFixed(2)}
-                    description={`Reg: ${totalPayDetails.regularHours.toFixed(2)}h · Extra: ${totalPayDetails.overtimeHours.toFixed(2)}h`}
+                    value={totalPayDetails.totalHours.toFixed(2)}
+                    description="Total horas trabajadas"
                     icon={Icons.Clock}
                 />
                 <StatCard

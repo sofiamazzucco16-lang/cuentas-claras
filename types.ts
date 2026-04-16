@@ -20,13 +20,11 @@ export interface Shift {
 }
 
 export interface PayDetails {
-    regularHours: number;
-    overtimeHours: number;
-    regularPay: number;        // Horas regulares × tarifa
-    overtimePay: number;       // Horas extra × (tarifa × 1.5)
+    totalHours: number;        // Total horas trabajadas
+    regularPay: number;        // Horas × tarifa (sin overtime)
     gratuity: number;          // Service charge total del período
     tips: number;              // Propinas con tarjeta total del período
-    grossPay: number;          // regularPay + overtimePay + gratuity + tips
+    grossPay: number;          // regularPay + gratuity + tips
     federalTax: number;        // Impuesto federal (% configurable)
     medicareTax: number;       // 1.45% fijo por ley
     socialSecurityTax: number; // 6.2% fijo por ley
